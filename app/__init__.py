@@ -1,0 +1,1 @@
+"""AI Auditor application package."""

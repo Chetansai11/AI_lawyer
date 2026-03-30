@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Auditor — Lawyer.com</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Inter", "system-ui", "sans-serif"] },
+            colors: {
+              firm: {
+                950: "#0a1628",
+                900: "#0f2744",
+                800: "#153a5c",
+                700: "#1e4a72",
+                accent: "#3b82f6",
+                glow: "#60a5fa",
+              },
+            },
+            keyframes: {
+              "pulse-soft": {
+                "0%, 100%": { opacity: "1" },
+                "50%": { opacity: "0.65" },
+              },
+              fadeIn: {
+                "0%": { opacity: "0", transform: "translateY(4px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+            },
+            animation: {
+              "pulse-soft": "pulse-soft 2s ease-in-out infinite",
+              fadeIn: "fadeIn 0.35s ease-out forwards",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      html,
+      body,
+      #root {
+        height: 100%;
+      }
+      body {
+        font-family: Inter, system-ui, sans-serif;
+        background-color: #0a1628;
+        color: #e2e8f0;
+        background-image:
+          radial-gradient(ellipse 120% 80% at 50% -40%, rgba(59, 130, 246, 0.18), transparent),
+          radial-gradient(ellipse 80% 50% at 100% 0%, rgba(30, 74, 114, 0.35), transparent);
+      }
+    </style>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+    <style>
+      .brief-prose {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #cbd5e1;
+      }
+      .brief-prose h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #f8fafc;
+        margin: 1.25rem 0 0.5rem;
+      }
+      .brief-prose h2:first-child {
+        margin-top: 0;
+      }
+      .brief-prose h3 {
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+        margin: 1rem 0 0.35rem;
+      }
+      .brief-prose p {
+        margin: 0.5rem 0;
+      }
+      .brief-prose ul {
+        margin: 0.35rem 0;
+        padding-left: 1.25rem;
+      }
+      .brief-prose li {
+        margin: 0.25rem 0;
+      }
+      .brief-prose strong {
+        color: #e2e8f0;
+        font-weight: 600;
+      }
+      .brief-prose em {
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <div id="root"></div>
+    <script type="text/babel" data-presets="react" src="/static/App.jsx"></script>
+  </body>
+</html>

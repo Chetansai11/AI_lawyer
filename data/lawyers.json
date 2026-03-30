@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Ava Thompson",
+    "location": "Austin",
+    "specialties": ["car accident", "personal injury"],
+    "rating": 4.8
+  },
+  {
+    "name": "Michael Chen",
+    "location": "Houston",
+    "specialties": ["workplace injury", "employment law"],
+    "rating": 4.6
+  },
+  {
+    "name": "Priya Nair",
+    "location": "Dallas",
+    "specialties": ["medical malpractice", "personal injury"],
+    "rating": 4.9
+  },
+  {
+    "name": "Jordan Blake",
+    "location": "Austin",
+    "specialties": ["contract dispute", "business litigation"],
+    "rating": 4.5
+  },
+  {
+    "name": "Elena Ruiz",
+    "location": "San Antonio",
+    "specialties": ["property dispute", "tenant rights"],
+    "rating": 4.7
+  },
+  {
+    "name": "Daniel Park",
+    "location": "Austin",
+    "specialties": ["slip and fall", "personal injury"],
+    "rating": 4.4
+  }
+]
