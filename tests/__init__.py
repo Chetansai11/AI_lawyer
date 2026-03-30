@@ -1,1 +1,1 @@
-# Tests for MoJo Intake Sentinel / AI Auditor
+# Tests for AI Intake Auditor

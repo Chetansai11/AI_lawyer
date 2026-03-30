@@ -24,7 +24,7 @@ class LawyerMatch(TypedDict):
 
 
 class ConversationalState(TypedDict, total=False):
-    """Persistent state for MoJo Intake Sentinel (multi-turn)."""
+    """Persistent state for AI Intake Auditor (multi-turn)."""
 
     conversation: list[Message]
     extracted_facts: dict[str, str]

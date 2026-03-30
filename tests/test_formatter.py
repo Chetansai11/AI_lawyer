@@ -30,6 +30,8 @@ def test_format_brief_contains_sections() -> None:
     assert "Disclaimer" in md
     assert "legal advice" in md.lower()
     assert "### Key Facts" in md
+    assert "### Detailed Summary for Counsel" in md
+    assert "### Case Analysis" in md
     assert "slip and fall" in md
     assert "### Case Score" not in md
     assert "### Confidence" not in md
@@ -51,3 +53,4 @@ def test_format_brief_shows_gaps_in_summary() -> None:
     md = format_brief_markdown(st)
     assert "gaps" in md.lower() or "location" in md.lower()
     assert "Disclaimer" in md
+    assert "### Case Analysis" in md

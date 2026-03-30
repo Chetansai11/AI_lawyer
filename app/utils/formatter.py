@@ -98,6 +98,25 @@ def build_summary_paragraph(state: ConversationalState) -> str:
     return para1 + "\n\n" + para2
 
 
+def build_detailed_summary(state: ConversationalState) -> str:
+    facts = state.get("extracted_facts") or {}
+    missing = effective_missing_fields(state)
+
+    inc = _safe_plain(facts.get("incident_type", ""), empty="-")
+    loc = _safe_plain(facts.get("location", ""), empty="-")
+    dt = _safe_plain(facts.get("date", ""), empty="-")
+    inj = _safe_plain(facts.get("injuries", ""), empty="-")
+    risk = _safe_plain(state.get("risk_analysis", ""), empty="No analysis provided.")
+
+    missing_line = "None identified for initial triage." if not missing else _gap_labels(missing)
+    return (
+        f"The intake currently indicates a **{inc}** matter tied to **{loc}** on **{dt}**, with reported injuries/symptoms: **{inj}**. "
+        "This paragraph is designed for counsel handoff and preserves both source narrative and triage interpretation.\n\n"
+        f"- **Case analysis context:** {risk}\n"
+        f"- **Outstanding factual gaps:** {missing_line}\n"
+    )
+
+
 def format_brief_markdown(state: ConversationalState) -> str:
     facts = state.get("extracted_facts", {})
     assumptions = state.get("assumptions", [])
@@ -119,11 +138,14 @@ def format_brief_markdown(state: ConversationalState) -> str:
         follow_block = "- _(Clarifying pending)_"
 
     summary = build_summary_paragraph(state)
-
+    detailed_summary = build_detailed_summary(state)
     return f"""## Attorney Brief
 
 ### Summary
 {summary}
+
+### Detailed Summary for Counsel
+{detailed_summary}
 
 ### Key Facts
 - **Location:** {_safe_plain(facts.get('location', ''), empty='-')}
@@ -134,7 +156,7 @@ def format_brief_markdown(state: ConversationalState) -> str:
 ### Assumptions
 {assumptions_md}
 
-### Risk Analysis
+### Case Analysis
 {state.get('risk_analysis', '_No analysis yet._')}
 
 ### Recommended Lawyers

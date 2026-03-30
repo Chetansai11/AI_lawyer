@@ -57,6 +57,7 @@ def _heuristic_missing(facts: dict, transcript: str) -> list[str]:
 
 
 def suggest_next_question(missing: list[str], facts: dict) -> str:
+    # Keep per-field prompts short; caller can combine top gaps.
     order = ["date", "location", "incident_type", "injuries", "liability"]
     for field in order:
         if field not in missing:
@@ -77,8 +78,22 @@ def suggest_next_question(missing: list[str], facts: dict) -> str:
     return ""
 
 
-def _one_question(missing: list[str], facts: dict) -> str:
-    return suggest_next_question(missing, facts)
+def _follow_up_questions(missing: list[str], facts: dict) -> str:
+    """Return up to two prioritized follow-ups in one concise message."""
+    order = ["date", "location", "incident_type", "injuries", "liability"]
+    prompts: list[str] = []
+    for field in order:
+        if field in missing:
+            q = suggest_next_question([field], facts)
+            if q and q not in prompts:
+                prompts.append(q)
+        if len(prompts) >= 2:
+            break
+    if not prompts:
+        return ""
+    if len(prompts) == 1:
+        return prompts[0]
+    return prompts[0] + "\n" + prompts[1]
 
 
 def _heuristic_assumptions(missing: list[str], facts: dict) -> list[Assumption]:
@@ -195,7 +210,7 @@ async def run_auditor(state: ConversationalState) -> ConversationalState:
             if not missing:
                 nq = ""
             elif not nq:
-                nq = _one_question(missing, facts)
+                nq = _follow_up_questions(missing, facts)
 
             state["missing_fields"] = missing
             state["assumptions"] = assumptions
@@ -211,7 +226,7 @@ async def run_auditor(state: ConversationalState) -> ConversationalState:
             state["risk_analysis"] = _risk_text(missing, str(facts.get("incident_type", "")), plausibility)
             state["case_score"] = _score_case(len(missing), plausibility)
             state["confidence_score"] = round(max(0.15, min(1.0, 1 - 0.12 * len(missing))), 2)
-            state["next_question"] = _one_question(missing, facts) if missing else ""
+            state["next_question"] = _follow_up_questions(missing, facts) if missing else ""
             state["logs"].append(agent_log("AUDITOR", f"Gemini failed ({exc!r}); heuristic mode"))
     else:
         missing = _heuristic_missing(facts, transcript)
@@ -220,7 +235,7 @@ async def run_auditor(state: ConversationalState) -> ConversationalState:
         state["risk_analysis"] = _risk_text(missing, str(facts.get("incident_type", "")), plausibility)
         state["case_score"] = _score_case(len(missing), plausibility)
         state["confidence_score"] = round(max(0.15, min(1.0, 1 - 0.12 * len(missing))), 2)
-        state["next_question"] = _one_question(missing, facts) if missing else ""
+        state["next_question"] = _follow_up_questions(missing, facts) if missing else ""
         state["logs"].append(agent_log("AUDITOR", "Heuristic evaluation (no API key)"))
 
     state["logs"].append(

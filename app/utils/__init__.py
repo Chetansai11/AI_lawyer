@@ -1,1 +1,1 @@
-"""Utility modules for AI Auditor."""
+"""Utility modules for AI Intake Auditor."""

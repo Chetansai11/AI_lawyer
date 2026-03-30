@@ -1,1 +1,1 @@
-"""Agent modules for AI Auditor."""
+"""Agent modules for AI Intake Auditor."""

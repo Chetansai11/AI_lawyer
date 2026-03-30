@@ -32,10 +32,10 @@ Output ONE JSON object with:
 - risk_analysis: string, plain English, 3-6 sentences.
 - case_score: number 1..10 (readiness / triage strength, not legal outcome).
 - confidence_score: number 0..1.
-- next_question: string, EXACTLY ONE best follow-up question, OR empty string if missing_fields is empty.
+- next_question: string with one or more concise follow-up questions (up to 2), OR empty string if missing_fields is empty.
 
 Rules:
-- Never ask multiple questions in next_question; one sentence max.
+- Keep follow-up concise and practical.
 - Always proceed with assumptions when facts are missing; do not block.
-- If missing_fields is non-empty, next_question must target the highest-priority gap.
+- If missing_fields is non-empty, next_question should prioritize the highest-impact gaps first.
 """.strip()

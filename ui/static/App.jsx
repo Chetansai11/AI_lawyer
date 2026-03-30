@@ -1,6 +1,6 @@
 const { useState, useEffect, useRef, useCallback } = React;
 
-const SESSION_KEY = "ai_auditor_session_id";
+const SESSION_KEY = "ai_intake_auditor_session_id";
 
 function useSessionId() {
   const [sessionId, setSessionIdState] = useState(() => sessionStorage.getItem(SESSION_KEY) || null);
@@ -38,7 +38,7 @@ function BriefPane({ markdown }) {
 function AgentWelcomeBubble({ loading, text }) {
   return (
     <div className="mr-auto max-w-[95%] shrink-0 rounded-2xl border border-blue-500/20 bg-gradient-to-br from-firm-950/95 to-blue-950/30 px-4 py-4 text-[15px] leading-relaxed text-slate-200 shadow-lg shadow-blue-950/20">
-      <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-blue-400/90">AI Auditor</div>
+      <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-blue-400/90">AI Intake Auditor</div>
       {loading ? (
         <div className="space-y-2 animate-pulse">
           <div className="h-4 w-full max-w-md rounded bg-slate-700/50" />
@@ -61,7 +61,6 @@ function App() {
   const [logs, setLogs] = useState([]);
   const [sending, setSending] = useState(false);
   const [toast, setToast] = useState(null);
-  const [mojoScore, setMojoScore] = useState(842);
   const [showLogs, setShowLogs] = useState(true);
   const [lawyerMatches, setLawyerMatches] = useState([]);
   /** Latest counsel-only metrics (not shown in chat or client brief); one panel updates in place. */
@@ -90,16 +89,6 @@ function App() {
     return () => {
       if (toastTimer.current) window.clearTimeout(toastTimer.current);
     };
-  }, []);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      setMojoScore((n) => {
-        const delta = Math.floor(Math.random() * 7) - 2;
-        return Math.min(999, Math.max(600, n + delta));
-      });
-    }, 1800);
-    return () => window.clearInterval(id);
   }, []);
 
   const loadWelcome = useCallback(async () => {
@@ -208,7 +197,7 @@ function App() {
           lawyer_name: selectedLawyer.name || "",
           lawyer_email: selectedLawyer.contact_email || "",
           brief_markdown: briefMd,
-          note: "Shared from AI Auditor UI",
+          note: "Shared from AI Intake Auditor UI",
         }),
       });
       if (!res.ok) throw new Error("Share failed");
@@ -273,7 +262,7 @@ function App() {
               <span className="text-lg font-semibold tracking-tight text-blue-200">L</span>
             </div>
             <div>
-              <h1 className="text-xl font-semibold tracking-tight text-white md:text-2xl">AI Auditor</h1>
+              <h1 className="text-xl font-semibold tracking-tight text-white md:text-2xl">AI Intake Auditor</h1>
               <p className="text-xs text-slate-400 md:text-sm">Lawyer.com · Conversational legal intake</p>
             </div>
           </div>
@@ -285,9 +274,6 @@ function App() {
               </span>
               Agent online
             </span>
-            <div className="rounded-full border border-blue-400/25 bg-firm-900/80 px-3 py-1 text-xs tabular-nums text-blue-100 md:text-sm">
-              MoJo <span className="font-semibold text-white">{mojoScore}</span>
-            </div>
             <div className="rounded-full border border-white/10 bg-firm-900/60 px-3 py-1 text-xs text-slate-400">
               Saved ~45m
             </div>
@@ -331,7 +317,7 @@ function App() {
       )}
 
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-4 py-4 md:px-8 md:py-5">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+        <div className="grid items-start grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
           {/* Chat */}
           <section
             className="flex min-h-[500px] flex-col rounded-2xl border border-white/10 bg-firm-900/40 shadow-xl shadow-black/20 backdrop-blur-sm"
@@ -363,7 +349,7 @@ function App() {
                   }
                 >
                   <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                    {msg.role === "user" ? "You" : "AI Auditor"}
+                    {msg.role === "user" ? "You" : "AI Intake Auditor"}
                   </div>
                   <div className="whitespace-pre-wrap">{msg.content}</div>
                 </div>
@@ -426,7 +412,7 @@ function App() {
                 Synced
               </span>
             </div>
-            <div className="flex-1 px-4 py-4">
+            <div className="max-h-[500px] overflow-y-auto px-4 py-4">
               <BriefPane markdown={briefMd} />
             </div>
           </section>

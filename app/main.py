@@ -26,7 +26,7 @@ _UI_DIST = _UI_DIR / "dist"
 _UI_DIST_INDEX = _UI_DIST / "index.html"
 _UI_DIST_ASSETS = _UI_DIST / "assets"
 
-app = FastAPI(title="AI Auditor", version="2.0.0")
+app = FastAPI(title="AI Intake Auditor", version="2.0.0")
 
 
 @app.middleware("http")

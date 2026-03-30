@@ -1,15 +1,16 @@
-# MoJo Intake Sentinel (AI Auditor)
+# AI Intake Auditor
 
-MoJo Intake Sentinel is an interview-style demo: a **multi-turn chat** on the left and a **live Markdown attorney brief** on the right. Orchestration is **async Python**: **scribe** → **parallel** (auditor + matcher + researcher) → **compose assistant reply**. (We avoid `LangGraph.ainvoke` here because its dict merge was **dropping accumulated `logs`** from earlier steps.)
+AI Intake Auditor is an interview-style demo: a **multi-turn chat** on the left and a **live Markdown attorney brief** on the right. Orchestration is **async Python**: **scribe** → **parallel** (auditor + matcher + researcher) → **compose assistant reply**. (We avoid `LangGraph.ainvoke` here because its dict merge was **dropping accumulated `logs`** from earlier steps.)
 
-> Folder on disk: `AI_Auditor/` (same codebase as the original AI Auditor project).
+> Folder on disk: `AI_Auditor/`.
 
 ## Features
 
 - **Stateful conversation** with server-side sessions (`session_id`)
 - **SCRIBE**: incremental fact extraction from the full transcript
-- **AUDITOR**: assumptions, risk, scores, **exactly one** follow-up question at a time
-- **MATCHER** + **RESEARCHER** (simulated plausibility + reasoning logs) in **parallel**
+- **AUDITOR**: assumptions, risk, and a **case readiness score on a 1-10 scale**
+- **MATCHER** + **RECOMMENDER** path: matcher ranks attorneys by fit; recommender-facing card data (rating/profile/contact) powers attorney actions in UI
+- **RESEARCHER** (simulated plausibility + reasoning logs) in **parallel**
 - **Gaps helper** (`effective_missing_fields`): summary/replies use **fact-based** gaps so “complete” is not shown while fields are still empty
 - **FastAPI**: `POST /chat` (primary), `POST /analyze` (one-shot), and a **single-page web UI** at `/`
 
@@ -153,5 +154,5 @@ python -m ruff format app tests
 ## Notes
 
 - **RESEARCHER** is simulated (no browser automation).
-- Assistant reply uses **one** clarifying question at a time when `missing_fields` is non-empty.
+- Assistant reply asks concise clarifying follow-ups based on `missing_fields` (can include multiple when useful).
 - `compose_assistant_reply` runs **after** `run_pipeline` so the chat reply and assistant turn are always present in the returned state.

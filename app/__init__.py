@@ -1,1 +1,1 @@
-"""AI Auditor application package."""
+"""AI Intake Auditor application package."""

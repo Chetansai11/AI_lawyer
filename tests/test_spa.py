@@ -11,7 +11,7 @@ def test_root_serves_spa() -> None:
     client = TestClient(app)
     response = client.get("/")
     assert response.status_code == 200
-    assert "AI Auditor" in response.text
+    assert "AI Intake Auditor" in response.text
 
 
 def test_ui_bundle_reachable() -> None:
@@ -25,4 +25,4 @@ def test_ui_bundle_reachable() -> None:
     else:
         jsx = client.get("/static/App.jsx")
         assert jsx.status_code == 200
-        assert "AI Auditor" in jsx.text or "App" in jsx.text
+        assert "AI Intake Auditor" in jsx.text or "App" in jsx.text

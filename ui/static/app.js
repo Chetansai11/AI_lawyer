@@ -1,8 +1,8 @@
 /**
- * MoJo Intake Sentinel — web client (calls same-origin /chat).
+ * AI Intake Auditor — web client (calls same-origin /chat).
  */
 
-const SESSION_KEY = "mojo_session_id";
+const SESSION_KEY = "ai_intake_auditor_session_id";
 
 const messagesEl = document.getElementById("messages");
 const briefEl = document.getElementById("brief");
@@ -39,7 +39,7 @@ function appendMessage(role, text) {
   wrap.className = `msg ${role}`;
   const meta = document.createElement("div");
   meta.className = "msg-meta";
-  meta.textContent = role === "user" ? "You" : "MoJo";
+  meta.textContent = role === "user" ? "You" : "AI Intake Auditor";
   const body = document.createElement("div");
   body.className = "msg-body";
   body.textContent = text;
