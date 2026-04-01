@@ -4,6 +4,14 @@ AI Intake Auditor is an interview-style demo: a **multi-turn chat** on the left 
 
 > Folder on disk: `AI_Auditor/`.
 
+## Screenshots
+
+![AI Intake Auditor — UI overview](img1.png)
+
+![AI Intake Auditor — chat and live brief](img2.png)
+
+![AI Intake Auditor — intake flow](img3.png)
+
 ## Features
 
 - **Stateful conversation** with server-side sessions (`session_id`)
