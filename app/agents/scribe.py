@@ -57,6 +57,12 @@ def _extract_incident_type(text: str) -> str:
         "assault": ["assault", "attacked", "battery"],
         "contract dispute": ["contract dispute", "breach of contract", "did not pay", "agreement broken"],
         "property dispute": ["property dispute", "landlord", "tenant", "eviction"],
+        "family law": ["divorce", "custody", "child support", "separation"],
+        "immigration": ["visa", "green card", "deportation", "asylum", "uscis"],
+        "dui": ["dui", "dwi", "drunk driving", "driving under the influence"],
+        "criminal defense": ["charged with", "arrested", "misdemeanor", "felony", "criminal charge"],
+        "bankruptcy": ["bankruptcy", "chapter 7", "chapter 13", "creditors"],
+        "employment law": ["wrongful termination", "discrimination", "hostile work environment", "wage theft"],
     }
     lowered = text.lower()
     for incident, variants in keywords.items():

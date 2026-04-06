@@ -38,6 +38,8 @@ class ConversationalState(TypedDict, total=False):
     logs: list[str]
     plausibility: str
     researcher_reasoning: str
+    case_research_summary: str
+    off_topic: bool
     assistant_reply: str
 
 
@@ -65,5 +67,7 @@ def empty_conversational_state() -> ConversationalState:
         "logs": [],
         "plausibility": "medium",
         "researcher_reasoning": "",
+        "case_research_summary": "",
+        "off_topic": False,
         "assistant_reply": "",
     }

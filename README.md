@@ -16,11 +16,12 @@ AI Intake Auditor is an interview-style demo: a **multi-turn chat** on the left 
 
 - **Stateful conversation** with server-side sessions (`session_id`)
 - **SCRIBE**: incremental fact extraction from the full transcript
-- **AUDITOR**: assumptions, risk, and a **case readiness score on a 1-10 scale**
-- **MATCHER** + **RECOMMENDER** path: matcher ranks attorneys by fit; recommender-facing card data (rating/profile/contact) powers attorney actions in UI
-- **RESEARCHER** (simulated plausibility + reasoning logs) in **parallel**
-- **Gaps helper** (`effective_missing_fields`): summary/replies use **fact-based** gaps so “complete” is not shown while fields are still empty
-- **FastAPI**: `POST /chat` (primary), `POST /analyze` (one-shot), and a **single-page web UI** at `/`
+- **AUDITOR**: assumptions, risk, **case readiness score (1–10)**, and **`off_topic` detection** — small talk or unrelated turns get a polite redirect to case-only details (LLM + heuristics)
+- **MATCHER**: ranks attorneys from `data/lawyers.json` (multi-practice roster); **top 6** matches in the API/UI
+- **RESEARCHER** (runs **in parallel** with auditor + matcher): plausibility triage, **illustrative case themes** for the brief (LLM when configured, typed fallbacks otherwise) — not caselaw or legal advice
+- **Gaps helper** (`effective_missing_fields`): brief and replies use **fact-based** gaps so “complete” is not shown while fields are still empty
+- **FastAPI**: `POST /chat` (primary), `POST /analyze` (one-shot), `GET /welcome`, and a **React** single-page UI at `/`
+- **Web UI**: intake chat and live brief use **in-panel scrolling** so long threads stay usable on one screen
 
 ## Project structure
 
@@ -44,6 +45,7 @@ AI_Auditor/
 ├── ui/
 │   ├── index.html           # Web UI shell
 │   ├── static/
+│   │   ├── App.jsx      # React UI (Babel in-browser)
 │   │   ├── app.css
 │   │   └── app.js
 ├── data/
@@ -52,6 +54,8 @@ AI_Auditor/
 ├── requirements.txt
 ├── requirements-dev.txt     # pytest, ruff
 ├── pyproject.toml           # ruff + pytest config
+├── Dockerfile               # container image for Railway / Docker
+├── railway.toml             # Railway: Docker build + /health
 ├── README.md
 ```
 
@@ -73,6 +77,10 @@ AI_Auditor/
   "lawyer_matches": [],
   "next_question": "",
   "confidence_score": 0.0,
+  "plausibility": "",
+  "researcher_reasoning": "",
+  "case_research_summary": "",
+  "off_topic": false,
   "logs": []
 }
 ```
@@ -204,6 +212,7 @@ python -m ruff format app tests
 
 ## Notes
 
-- **RESEARCHER** is simulated (no browser automation).
-- Assistant reply asks concise clarifying follow-ups based on `missing_fields` (can include multiple when useful).
-- `compose_assistant_reply` runs **after** `run_pipeline` so the chat reply and assistant turn are always present in the returned state.
+- **Research output** is **illustrative** (general patterns, disclaimers in the brief). It is **not** a substitute for research counsel or authoritative citations.
+- **Off-topic** turns are steered back to intake facts; the assistant does not engage unrelated chitchat as the main task.
+- Assistant replies are composed **after** `run_pipeline` via `response_composer` (natural phrasing from `next_question`, including off-topic redirects).
+- Sessions are **in-memory** per server process — fine for a single-instance demo; use Redis or a DB if you scale horizontally.

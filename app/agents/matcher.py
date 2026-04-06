@@ -67,6 +67,6 @@ async def run_matcher(state: ConversationalState) -> ConversationalState:
         )
 
     ranked.sort(key=lambda x: x["score"], reverse=True)
-    state["lawyer_matches"] = ranked[:3]
+    state["lawyer_matches"] = ranked[:6]
     state["logs"].append(agent_log("MATCHER", f"Selected top {len(state['lawyer_matches'])} lawyers"))
     return state

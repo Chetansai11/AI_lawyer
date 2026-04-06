@@ -14,6 +14,18 @@ _GAP_READABLE = {
 }
 
 _MAX_FACT_LEN = 400
+_MAX_RESEARCH_LEN = 5000
+
+
+def _safe_research_block(value: object, *, empty: str) -> str:
+    """Preserve newlines for bullet lists; trim length and strip risky markdown."""
+    s = str(value or "").strip()
+    if not s:
+        return empty
+    s = s.replace("**", "").replace("##", "").strip()
+    if len(s) > _MAX_RESEARCH_LEN:
+        s = s[: _MAX_RESEARCH_LEN - 1] + "…"
+    return s
 
 
 def _safe_plain(value: object, *, empty: str = "not yet specified") -> str:
@@ -158,6 +170,9 @@ def format_brief_markdown(state: ConversationalState) -> str:
 
 ### Case Analysis
 {state.get('risk_analysis', '_No analysis yet._')}
+
+### Illustrative research (client & counsel)
+{_safe_research_block(state.get('case_research_summary', ''), empty='_No illustrative themes yet — continue the intake._')}
 
 ### Recommended Lawyers
 {lawyers_md}

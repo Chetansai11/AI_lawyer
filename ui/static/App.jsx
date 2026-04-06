@@ -317,20 +317,20 @@ function App() {
       )}
 
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-4 py-4 md:px-8 md:py-5">
-        <div className="grid items-start grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
-          {/* Chat */}
+        <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2 lg:gap-6">
+          {/* Chat — fixed viewport band so messages scroll inside the card */}
           <section
-            className="flex min-h-[500px] flex-col rounded-2xl border border-white/10 bg-firm-900/40 shadow-xl shadow-black/20 backdrop-blur-sm"
+            className="flex max-h-[calc(100dvh-12rem)] min-h-[420px] flex-col rounded-2xl border border-white/10 bg-firm-900/40 shadow-xl shadow-black/20 backdrop-blur-sm lg:min-h-[min(520px,calc(100dvh-12rem))]"
             aria-label="Conversation"
           >
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            <div className="shrink-0 flex items-center justify-between border-b border-white/10 px-4 py-3">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Intake chat</h2>
               <span className="font-mono text-[10px] text-slate-500">
                 {sessionId ? `···${sessionId.slice(-8)}` : "new"}
               </span>
             </div>
             <div
-              className="flex-1 space-y-3 overflow-x-hidden px-4 py-3"
+              className="min-h-0 flex-1 space-y-3 overflow-y-auto overflow-x-hidden overscroll-contain px-4 py-3"
               role="log"
               aria-live="polite"
               aria-relevant="additions"
@@ -363,7 +363,7 @@ function App() {
               <div ref={messagesEndRef} />
             </div>
 
-            <details className="border-t border-white/10 px-4 py-2" open={showLogs} onToggle={(e) => setShowLogs(e.target.open)}>
+            <details className="shrink-0 border-t border-white/10 px-4 py-2" open={showLogs} onToggle={(e) => setShowLogs(e.target.open)}>
               <summary className="cursor-pointer text-[11px] font-medium uppercase tracking-wider text-slate-500">
                 Agent orchestration log
               </summary>
@@ -372,7 +372,7 @@ function App() {
               </pre>
             </details>
 
-            <form className="border-t border-white/10 p-3" onSubmit={sendMessage}>
+            <form className="shrink-0 border-t border-white/10 p-3" onSubmit={sendMessage}>
               <label className="sr-only" htmlFor="composer-input">
                 Message
               </label>
@@ -401,18 +401,18 @@ function App() {
             </form>
           </section>
 
-          {/* Brief */}
+          {/* Brief — same height band as chat for layout balance */}
           <section
-            className="flex min-h-[500px] flex-col rounded-2xl border border-white/10 bg-firm-900/40 shadow-xl shadow-black/20 backdrop-blur-sm"
+            className="flex max-h-[calc(100dvh-12rem)] min-h-[420px] flex-col rounded-2xl border border-white/10 bg-firm-900/40 shadow-xl shadow-black/20 backdrop-blur-sm lg:min-h-[min(520px,calc(100dvh-12rem))]"
             aria-label="Attorney brief"
           >
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            <div className="shrink-0 flex items-center justify-between border-b border-white/10 px-4 py-3">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Live brief</h2>
               <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-2 py-0.5 text-[10px] font-medium text-blue-200">
                 Synced
               </span>
             </div>
-            <div className="max-h-[500px] overflow-y-auto px-4 py-4">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">
               <BriefPane markdown={briefMd} />
             </div>
           </section>

@@ -31,9 +31,11 @@ async def _parallel_agents(state: ConversationalState) -> ConversationalState:
     merged["case_score"] = auditor_state.get("case_score", 0.0)
     merged["confidence_score"] = auditor_state.get("confidence_score", 0.0)
     merged["next_question"] = auditor_state.get("next_question", "")
+    merged["off_topic"] = bool(auditor_state.get("off_topic", False))
     merged["lawyer_matches"] = matcher_state.get("lawyer_matches", [])
     merged["plausibility"] = researcher_state.get("plausibility", "medium")
     merged["researcher_reasoning"] = researcher_state.get("researcher_reasoning", "")
+    merged["case_research_summary"] = researcher_state.get("case_research_summary", "")
 
     merged["logs"] = list(state["logs"])
     for branch in (auditor_state, matcher_state, researcher_state):

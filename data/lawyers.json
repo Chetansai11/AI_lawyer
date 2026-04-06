@@ -34,5 +34,77 @@
     "location": "Austin",
     "specialties": ["slip and fall", "personal injury"],
     "rating": 4.4
+  },
+  {
+    "name": "Sarah Okonkwo",
+    "location": "Dallas",
+    "specialties": ["family law", "divorce", "custody"],
+    "rating": 4.8
+  },
+  {
+    "name": "James Whitaker",
+    "location": "Houston",
+    "specialties": ["immigration", "visa", "asylum"],
+    "rating": 4.7
+  },
+  {
+    "name": "Rosa Delgado",
+    "location": "Fort Worth",
+    "specialties": ["criminal defense", "dui"],
+    "rating": 4.5
+  },
+  {
+    "name": "Kevin O'Brien",
+    "location": "Austin",
+    "specialties": ["bankruptcy", "debt relief"],
+    "rating": 4.3
+  },
+  {
+    "name": "Mei Lin",
+    "location": "Plano",
+    "specialties": ["employment law", "wrongful termination"],
+    "rating": 4.6
+  },
+  {
+    "name": "Andre Williams",
+    "location": "Houston",
+    "specialties": ["assault", "personal injury"],
+    "rating": 4.5
+  },
+  {
+    "name": "Fatima Al-Hassan",
+    "location": "Dallas",
+    "specialties": ["real estate", "property dispute"],
+    "rating": 4.6
+  },
+  {
+    "name": "Gregory Stein",
+    "location": "Austin",
+    "specialties": ["intellectual property", "business litigation"],
+    "rating": 4.7
+  },
+  {
+    "name": "Nina Patel",
+    "location": "San Antonio",
+    "specialties": ["elder law", "estate planning"],
+    "rating": 4.8
+  },
+  {
+    "name": "Carlos Mendez",
+    "location": "El Paso",
+    "specialties": ["immigration", "family law"],
+    "rating": 4.4
+  },
+  {
+    "name": "Emily Carter",
+    "location": "Dallas",
+    "specialties": ["medical malpractice", "nursing home"],
+    "rating": 4.9
+  },
+  {
+    "name": "David Kim",
+    "location": "Irving",
+    "specialties": ["tax controversy", "business litigation"],
+    "rating": 4.5
   }
 ]

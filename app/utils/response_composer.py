@@ -26,7 +26,7 @@ Guidelines:
 - Write like a real chat: short back-and-forth, not an interrogation
 - Acknowledge what the user just said in a natural line or two (vary your openers across turns)
 - Avoid repeating their whole story or quoting long chunks
-- Ask natural follow-up questions (one or two max when needed)
+- Ask natural follow-up questions (one or four max when needed)
 - Keep responses concise (2–4 sentences max)
 - Use conversational phrasing (not formal/legal tone)
 - Do NOT sound like a form or checklist
@@ -74,6 +74,17 @@ COMPLETE_MESSAGE = (
     "You can review the updated brief on the right."
 )
 
+PROMPT_OFF_TOPIC = """The user's last message was not about their legal situation (small talk or unrelated).
+
+Write ONE short reply (2–4 sentences):
+- Politely say this chat is only for documenting their legal matter for attorneys.
+- Ask them to describe what happened: when, where, type of incident, and any injuries or care—so the brief on the right can be filled in.
+- Do not answer unrelated topics or roleplay.
+
+Use this required substance (rephrase naturally): {next_question}
+
+Return ONLY the reply text."""
+
 
 def _recent_conversation_snippet(conv: list[dict[str, Any]], *, max_messages: int = 3) -> str:
     if not conv:
@@ -111,6 +122,28 @@ async def generate_human_response(state: ConversationalState | dict[str, Any], l
     next_question = str(state.get("next_question") or "").strip()
     if not next_question:
         return COMPLETE_MESSAGE
+
+    if state.get("off_topic"):
+        nq = next_question
+        user_payload = PROMPT_OFF_TOPIC.format(next_question=nq)
+        if llm is not None:
+            result = llm(user_payload)
+            if inspect.isawaitable(result):
+                result = await result
+            text = _strip_code_fences(str(result))
+            return text if text else nq
+        try:
+            raw = await chat_text(
+                system=(
+                    "You write the visible chat message for a legal intake assistant. "
+                    "Output plain text only: no quotes, no markdown fences, no labels."
+                ),
+                user=user_payload,
+            )
+            text = _strip_code_fences(raw)
+            return text[:2000] if text else nq
+        except Exception:
+            return nq
 
     conv = list(state.get("conversation") or [])
     ack_phrase = random.choice(ACK_PHRASES)

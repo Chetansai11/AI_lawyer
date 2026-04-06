@@ -2,12 +2,101 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from typing import Any
 
 from app.llm import chat_json, get_client
 from app.state import Assumption, ConversationalState, empty_conversational_state
 from app.utils.logger import agent_log
 from app.utils.prompts import AUDITOR_CONVERSATION_SYSTEM
+
+OFF_TOPIC_REDIRECT = (
+    "Please share only details about your legal situation: when and where things happened, "
+    "what type of incident it was, and any injuries or medical care—so we can build your attorney brief."
+)
+
+
+def _latest_user_message(state: ConversationalState) -> str:
+    conv = list(state.get("conversation") or [])
+    for m in reversed(conv):
+        if m.get("role") == "user":
+            return str(m.get("content") or "").strip()
+    return ""
+
+
+_CASE_HINTS = (
+    "accident",
+    "injur",
+    "hurt",
+    "lawyer",
+    "legal",
+    "suit",
+    "case",
+    "slip",
+    "fall",
+    "malpractice",
+    "contract",
+    "tenant",
+    "landlord",
+    "employer",
+    "assault",
+    "divorce",
+    "custody",
+    "visa",
+    "immigration",
+    "dui",
+    "arrest",
+    "bankrupt",
+)
+
+
+def _heuristic_off_topic(latest: str, facts: dict[str, Any]) -> bool:
+    """Conservative: flag only clear chitchat / unrelated lines when intake is still thin."""
+    if not latest:
+        return False
+    low = latest.lower().strip()
+    # Strong case signals in this turn → on-topic
+    if any(h in low for h in _CASE_HINTS):
+        return False
+    filled = sum(
+        1
+        for k in ("location", "date", "incident_type", "injuries")
+        if str(facts.get(k, "")).strip()
+    )
+    if filled >= 2 and len(latest) < 120:
+        # Short ack after they've given facts → not off-topic
+        return False
+
+    unrelated = (
+        "weather",
+        "joke",
+        "recipe",
+        "stock price",
+        "who won the",
+        "ignore previous",
+        "pretend you",
+    )
+    if any(u in low for u in unrelated):
+        return True
+
+    # Very short greeting-only style with no case content
+    if len(latest) < 100:
+        if re.match(
+            r"^(hi|hello|hey|good\s+(morning|afternoon|evening)|thanks?|thank\s+you)[\s!,?.]*$",
+            low,
+        ):
+            return True
+        if "thanks for reaching" in low and filled == 0:
+            return True
+
+    return False
+
+
+def _apply_off_topic(off_topic: bool, nq: str, missing: list[str]) -> tuple[bool, str]:
+    if not off_topic:
+        return False, nq
+    text = ((nq or "").strip() or OFF_TOPIC_REDIRECT)
+    return True, text
 
 
 def _facts_incomplete(facts: dict) -> list[str]:
@@ -185,11 +274,17 @@ async def run_auditor(state: ConversationalState) -> ConversationalState:
         ensure_ascii=False,
     )
 
+    latest = _latest_user_message(state)
+
     if get_client():
         try:
             payload = await chat_json(AUDITOR_CONVERSATION_SYSTEM, user_block)
             if not isinstance(payload, dict):
                 raise ValueError("auditor JSON must be an object")
+
+            off_topic = bool(payload.get("off_topic"))
+            if not off_topic and _heuristic_off_topic(latest, facts):
+                off_topic = True
 
             raw_missing = payload.get("missing_fields", [])
             norm_map = {"injury": "injuries", "fault": "liability", "negligence": "liability"}
@@ -212,6 +307,11 @@ async def run_auditor(state: ConversationalState) -> ConversationalState:
             elif not nq:
                 nq = _follow_up_questions(missing, facts)
 
+            off_topic, nq = _apply_off_topic(off_topic, nq, missing)
+            if not missing and off_topic:
+                missing = _heuristic_missing(facts, transcript) or ["incident_type"]
+
+            state["off_topic"] = off_topic
             state["missing_fields"] = missing
             state["assumptions"] = assumptions
             state["risk_analysis"] = risk
@@ -221,21 +321,33 @@ async def run_auditor(state: ConversationalState) -> ConversationalState:
             state["logs"].append(agent_log("AUDITOR", "Used Gemini for case evaluation"))
         except Exception as exc:
             missing = _heuristic_missing(facts, transcript)
+            off_topic = _heuristic_off_topic(latest, facts)
+            nq = _follow_up_questions(missing, facts) if missing else ""
+            off_topic, nq = _apply_off_topic(off_topic, nq, missing)
+            if not missing and off_topic:
+                missing = _heuristic_missing(facts, transcript) or ["incident_type"]
+            state["off_topic"] = off_topic
             state["missing_fields"] = missing
             state["assumptions"] = _heuristic_assumptions(missing, facts)
             state["risk_analysis"] = _risk_text(missing, str(facts.get("incident_type", "")), plausibility)
             state["case_score"] = _score_case(len(missing), plausibility)
             state["confidence_score"] = round(max(0.15, min(1.0, 1 - 0.12 * len(missing))), 2)
-            state["next_question"] = _follow_up_questions(missing, facts) if missing else ""
+            state["next_question"] = nq
             state["logs"].append(agent_log("AUDITOR", f"Gemini failed ({exc!r}); heuristic mode"))
     else:
         missing = _heuristic_missing(facts, transcript)
+        off_topic = _heuristic_off_topic(latest, facts)
+        nq = _follow_up_questions(missing, facts) if missing else ""
+        off_topic, nq = _apply_off_topic(off_topic, nq, missing)
+        if not missing and off_topic:
+            missing = _heuristic_missing(facts, transcript) or ["incident_type"]
+        state["off_topic"] = off_topic
         state["missing_fields"] = missing
         state["assumptions"] = _heuristic_assumptions(missing, facts)
         state["risk_analysis"] = _risk_text(missing, str(facts.get("incident_type", "")), plausibility)
         state["case_score"] = _score_case(len(missing), plausibility)
         state["confidence_score"] = round(max(0.15, min(1.0, 1 - 0.12 * len(missing))), 2)
-        state["next_question"] = _follow_up_questions(missing, facts) if missing else ""
+        state["next_question"] = nq
         state["logs"].append(agent_log("AUDITOR", "Heuristic evaluation (no API key)"))
 
     state["logs"].append(
