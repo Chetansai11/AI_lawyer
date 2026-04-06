@@ -103,6 +103,49 @@ python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
    - **App:** <http://127.0.0.1:8000/>
    - API docs: <http://127.0.0.1:8000/docs>
 
+## Deploy on Railway
+
+The repo includes a **`Dockerfile`**, **`railway.toml`** (Docker build + `/health` check), and **`.dockerignore`**.
+
+### One-time setup
+
+1. Create a [Railway](https://railway.app/) account and install the [Railway CLI](https://docs.railway.app/develop/cli) (optional; the web UI is enough).
+2. **New project** → **Deploy from GitHub repo** → select this repository.
+3. Railway will detect the Dockerfile and build the image.
+
+### Environment variables
+
+In the Railway service → **Variables**, add at least:
+
+| Variable | Required | Notes |
+|----------|----------|--------|
+| `GEMINI_API_KEY` | Yes (for real LLM) | Same as local `.env` |
+| `GEMINI_MODEL` | No | Optional override |
+| `GEMINI_TEMPERATURE` | No | Optional |
+
+Railway injects **`PORT`** automatically; the container listens on `0.0.0.0` using that port.
+
+### Deploy flow
+
+- **GitHub:** Push to `main` (or your connected branch) → Railway rebuilds and redeploys.
+- **CLI (optional):** `railway login` → `railway link` in the project folder → `railway up` for deploys.
+
+### After deploy
+
+- Open the **public URL** Railway assigns (Settings → Networking → generate domain if needed).
+- Health: `https://<your-domain>/health` should return JSON.
+
+### Local Docker check (optional)
+
+```bash
+docker build -t ai-intake-auditor .
+docker run --rm -p 8000:8000 -e GEMINI_API_KEY=your_key -e PORT=8000 ai-intake-auditor
+```
+
+Then visit <http://127.0.0.1:8000/>.
+
+**Note:** Chat sessions are stored **in memory** on one instance. For a single Railway instance this is fine for demos; scale-out would need shared storage (e.g. Redis).
+
 ## API
 
 ### `POST /chat` (primary)
